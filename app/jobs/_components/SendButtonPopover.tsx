@@ -1,24 +1,25 @@
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import { Icon } from "@iconify/react";
+import { JobStage } from "@prisma/client";
 
-const stageNames = [
-  { name: "lead" },
-  { name: "website" },
-  { name: "inspect" },
-  { name: "schedule" },
-  { name: "completed" },
-  { name: "followup" },
-  { name: "missed" },
-  { name: "subcontractors" },
+const stageNames: { name: JobStage }[] = [
+  { name: JobStage.lead },
+  { name: JobStage.website },
+  { name: JobStage.inspect },
+  { name: JobStage.schedule },
+  { name: JobStage.completed },
+  { name: JobStage.followup },
+  { name: JobStage.missed },
+  { name: JobStage.subcontractors },
+  { name: JobStage.accepted }, // Add this if it's in your JobStage enum
 ];
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 interface SendButtonPopoverProps {
-  handleUpdateRow: (location: string) => Promise<void>;
+  handleUpdateRow: (location: JobStage) => Promise<void>;
 }
 
 export default function SendButtonPopover({

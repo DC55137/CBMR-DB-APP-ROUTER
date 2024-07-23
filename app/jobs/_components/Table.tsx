@@ -11,7 +11,7 @@ import Search from "./Search";
 import Pagination from "./Pagination";
 import Tabs from "./Tabs";
 import TableEmptyRows from "./TableEmptyRows";
-import { Job } from "@prisma/client";
+import { Job, JobStage } from "@prisma/client";
 import updateJobs from "@/actions/updateJobs";
 
 interface TableProps {
@@ -55,7 +55,7 @@ export default function Table({ initialJobs, showExtra }: TableProps) {
     filterStage,
   });
 
-  const handleUpdateRow = async (location: string) => {
+  const handleUpdateRow = async (location: JobStage) => {
     if (window.confirm(`Are you sure you want to move to ${location}?`)) {
       const sendRows = jobs.filter((row) => selected.includes(row.id));
       setSelected([]);

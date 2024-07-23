@@ -7,7 +7,7 @@ import ActionButtonPopover from "./ActionButtonPopover";
 import MessagesButton from "./MessagesButton";
 import { useJobStore } from "@/lib/zustand";
 import { toast } from "react-toastify";
-import { Job } from "@prisma/client";
+import { Job, JobStage } from "@prisma/client";
 import CustomCheckbox from "./CustomCheckbox";
 
 import {
@@ -20,10 +20,9 @@ import deleteJobs from "@/actions/deleteJobs";
 
 interface TableSelectedActionsProps {
   rowCount: number;
-
   numSelected: number;
   onSelectAllRows: (checked: boolean) => void;
-  handleUpdateRow: (location: string) => Promise<void>;
+  handleUpdateRow: (location: JobStage) => Promise<void>;
   selected: string[];
   dataFiltered: Job[];
   jobs: Job[];
