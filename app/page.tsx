@@ -9,6 +9,7 @@ import { Briefcase, FileText, PlusCircle, Calendar } from "lucide-react";
 import RecentActivity from "./_components/RecentActivity";
 import QuickMetrics from "./_components/QuickMetrics";
 import ScheduledJobs from "./_components/ScheduledJobs";
+import InspectJobs from "./_components/InspectJobs";
 
 type JobCounts = Partial<Record<JobStage, number>>;
 
@@ -22,11 +23,15 @@ export default async function Home() {
 
   const recentChanges = jobs.filter((job) => job.updatedAt !== null);
   const today = new Date().toISOString().split("T")[0];
-  const recentActivity = recentChanges.filter(
-    (job) => job.updatedAt?.toISOString().split("T")[0] === today
-  );
-
+  const recentActivity = recentChanges
+    .filter((job) => job.updatedAt?.toISOString().split("T")[0] === today)
+    .sort((a, b) => {
+      const dateA = a.updatedAt || a.date;
+      const dateB = b.updatedAt || b.date;
+      return dateB.getTime() - dateA.getTime();
+    });
   const scheduledJobs = jobs.filter((job) => job.stage === "schedule");
+  const inspectJobs = jobs.filter((job) => job.stage === "inspect");
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -46,6 +51,9 @@ export default async function Home() {
 
               <Suspense fallback={<div>Loading scheduled jobs...</div>}>
                 <ScheduledJobs jobs={scheduledJobs} />
+              </Suspense>
+              <Suspense fallback={<div>Loading scheduled jobs...</div>}>
+                <InspectJobs jobs={inspectJobs} />
               </Suspense>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

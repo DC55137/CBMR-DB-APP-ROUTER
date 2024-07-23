@@ -28,7 +28,7 @@ const JobSchema = z.object({
     "subcontractors",
     "followup",
     "accepted",
-    "website",
+    "quoted",
   ]),
 });
 
@@ -43,7 +43,7 @@ const stageOptions = [
   { value: "subcontractors", label: "Subcontractors" },
   { value: "followup", label: "Follow Up" },
   { value: "accepted", label: "Accepted" },
-  { value: "website", label: "Website" },
+  { value: "quoted", label: "Quoted" },
 ];
 
 export default function NewJobForm() {

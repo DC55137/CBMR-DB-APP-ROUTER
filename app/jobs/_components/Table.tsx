@@ -1,3 +1,4 @@
+// app/jobs/_components/Table.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -23,7 +24,6 @@ export default function Table({ initialJobs, showExtra }: TableProps) {
   const [showColumn, setShowColumn] = useState(true);
   const { jobs, setJobs, updateJobRows } = useJobStore();
 
-  // Set initial jobs in Zustand store
   useEffect(() => {
     setJobs(initialJobs);
   }, [initialJobs, setJobs]);
@@ -83,7 +83,7 @@ export default function Table({ initialJobs, showExtra }: TableProps) {
   return (
     <>
       <div className="flex flex-col">
-        <div className="overflow-x-auto rounded-t-lg border-2 border-b-0 border-main-3 md:overflow-visible ">
+        <div className="overflow-x-auto rounded-t-lg border-2 border-b-0 border-main-3 md:overflow-visible">
           {!filterName && (
             <Tabs
               jobs={jobs}
@@ -96,7 +96,7 @@ export default function Table({ initialJobs, showExtra }: TableProps) {
             onFilterName={handleFilterName}
             setSelected={setSelected}
           />
-          <div className="relative block min-w-full align-middle ">
+          <div className="relative block min-w-full align-middle">
             {selected.length > 0 && (
               <TableSelectedActions
                 dataFiltered={dataFiltered}
@@ -115,34 +115,40 @@ export default function Table({ initialJobs, showExtra }: TableProps) {
                 }
               />
             )}
-            <table className="relative min-w-full ">
-              <TableHead
-                rowCount={dataFiltered.length}
-                numSelected={selected.length}
-                onSelectAllRows={(checked: boolean) =>
-                  onSelectAllRows(
-                    checked,
-                    dataFiltered.map((row) => row.id)
-                  )
-                }
-              />
-              <tbody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow
-                      key={row.id}
-                      row={row}
-                      selected={selected.includes(row.id)}
-                      onSelectRow={() => onSelectRow(row.id)}
-                      showColumn={showColumn}
-                    />
-                  ))}
-                <TableEmptyRows
-                  emptyRows={emptyRows(page, rowsPerPage, dataFiltered.length)}
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-auto">
+                <TableHead
+                  rowCount={dataFiltered.length}
+                  numSelected={selected.length}
+                  onSelectAllRows={(checked: boolean) =>
+                    onSelectAllRows(
+                      checked,
+                      dataFiltered.map((row) => row.id)
+                    )
+                  }
                 />
-              </tbody>
-            </table>
+                <tbody>
+                  {dataFiltered
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <TableRow
+                        key={row.id}
+                        row={row}
+                        selected={selected.includes(row.id)}
+                        onSelectRow={() => onSelectRow(row.id)}
+                        showColumn={showColumn}
+                      />
+                    ))}
+                  <TableEmptyRows
+                    emptyRows={emptyRows(
+                      page,
+                      rowsPerPage,
+                      dataFiltered.length
+                    )}
+                  />
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

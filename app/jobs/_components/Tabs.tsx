@@ -20,8 +20,8 @@ const TABS = [
     textColor: "text-yellow-200",
   },
   {
-    value: "website",
-    label: "Website",
+    value: "quoted",
+    label: "Quoted",
     color: "bg-orange-500",
     textColor: "text-orange-200",
   },

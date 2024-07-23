@@ -1,8 +1,9 @@
-// app/job/[id]/page.tsx
-
+// app/jobs/[id]/page.tsx
 import { notFound } from "next/navigation";
 import { getJob } from "@/actions/getJob";
 import JobGeneral from "./_components/JobGeneral";
+import JobQuote from "./_components/JobQuote";
+import JobImages from "./_components/JobImages";
 import Tabs from "./_components/Tabs";
 
 interface ViewJobProps {
@@ -23,7 +24,18 @@ export default async function ViewJob({ params }: ViewJobProps) {
       icon: "ic:round-account-box",
       component: <JobGeneral job={job} />,
     },
-    // Add more tabs here in the future
+    {
+      value: "quote",
+      label: "Quote",
+      icon: "ic:round-description",
+      component: <JobQuote job={job} />,
+    },
+    {
+      value: "images",
+      label: "Images",
+      icon: "ic:round-image",
+      component: <JobImages job={job} />,
+    },
   ];
 
   return (

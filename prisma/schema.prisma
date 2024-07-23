@@ -9,6 +9,7 @@ datasource db {
 
 enum JobStage {
   lead
+  quoted
   inspect
   schedule
   missed
@@ -16,7 +17,6 @@ enum JobStage {
   subcontractors
   followup
   accepted
-  website
 }
 
 enum InvoiceStatus {
@@ -43,6 +43,11 @@ model Job {
   startDate   DateTime?
   endDate     DateTime?
   quotedPrice  Float?
+  quoteImage String?
+  image1 String?
+  image2 String?
+  image3 String?
+  image4 String?
   updatedAt   DateTime?  @updatedAt
 }
 

@@ -1,3 +1,4 @@
+// app/jobs/_components/TableHead.tsx
 import React from "react";
 import { headLabel } from "@/data/constants";
 import CustomCheckbox from "./CustomCheckbox";
@@ -16,27 +17,25 @@ export function TableHead({
   return (
     <thead className="border-b border-main-4 bg-main-3">
       <tr>
-        <th className="w-2 px-4 py-2">
+        <th className="w-2 px-2 sm:px-4 py-2">
           <CustomCheckbox
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={(event) => onSelectAllRows(event.target.checked)}
           />
         </th>
-
-        <th></th>
-
+        <th className="px-2 sm:px-4 py-2"></th>
         {headLabel.map((headCell) => (
           <th
-            className={`px-4 py-2 text-slate-12 align-${
+            className={`px-2 sm:px-4 py-2 text-slate-12 align-${
               headCell.align || "left"
-            }`}
+            } 
+              ${headCell.hideOnMobile ? "hidden sm:table-cell" : ""}`}
             style={{ minWidth: headCell.minWidth }}
             key={headCell.id}
           >
-            {headCell.label}
+            <span className="text-xs sm:text-sm">{headCell.label}</span>
           </th>
         ))}
-        <th></th>
       </tr>
     </thead>
   );

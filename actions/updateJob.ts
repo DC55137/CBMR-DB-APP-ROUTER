@@ -16,6 +16,11 @@ export async function updateJob(data: Partial<Job>) {
         stage: data.stage as JobStage,
         address: data.address,
         notes: data.notes,
+        quoteImage: data.quoteImage,
+        image1: data.image1,
+        image2: data.image2,
+        image3: data.image3,
+        image4: data.image4,
         // Add other fields as necessary
       },
     });

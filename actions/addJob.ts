@@ -22,7 +22,7 @@ const JobSchema = z.object({
       "subcontractors",
       "followup",
       "accepted",
-      "website",
+      "quoted",
     ])
     .default("lead"),
 });

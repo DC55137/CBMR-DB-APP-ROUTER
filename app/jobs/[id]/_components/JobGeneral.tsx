@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,7 +67,7 @@ export default function JobGeneral({ job }: JobGeneralProps) {
       </h1>
       {job.date && (
         <p className="text-sm text-gray-400 mb-4">
-          Created {new Date(job.date).toLocaleDateString()}
+          Created {format(new Date(job.date), "dd/MM/yyyy")}
         </p>
       )}
       <div className="mx-auto grid w-[1000px] rounded-md bg-slate-800 p-10">

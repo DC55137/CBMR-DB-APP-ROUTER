@@ -32,7 +32,7 @@ const displayedStages: JobStage[] = [
   "inspect",
   "schedule",
   "followup",
-  "website",
+  "quoted",
 ];
 
 const chartConfig: Record<JobStage, { label: string; color: string }> = {
@@ -68,8 +68,8 @@ const chartConfig: Record<JobStage, { label: string; color: string }> = {
     label: "Accepted",
     color: "hsl(var(--chart-8))",
   },
-  website: {
-    label: "Website",
+  quoted: {
+    label: "Quoted",
     color: "hsl(var(--chart-5))",
   },
 };

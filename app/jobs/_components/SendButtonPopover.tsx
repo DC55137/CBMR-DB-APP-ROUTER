@@ -5,7 +5,7 @@ import { JobStage } from "@prisma/client";
 
 const stageNames: { name: JobStage }[] = [
   { name: JobStage.lead },
-  { name: JobStage.website },
+  { name: JobStage.quoted },
   { name: JobStage.inspect },
   { name: JobStage.schedule },
   { name: JobStage.completed },

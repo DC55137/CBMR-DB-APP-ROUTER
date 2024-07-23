@@ -32,7 +32,6 @@ interface TableSelectedActionsProps {
 
 export default function TableSelectedActions({
   rowCount,
-
   numSelected,
   onSelectAllRows,
   handleUpdateRow,
