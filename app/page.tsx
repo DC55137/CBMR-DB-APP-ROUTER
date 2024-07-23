@@ -21,7 +21,10 @@ export default async function Home() {
 
   const recentJobs = jobs.slice(-10, -1);
   const recentChanges = jobs.filter((job) => job.updatedAt !== null);
-  const recentActivity = recentChanges.slice(-10, -1);
+  const today = new Date().toISOString().split("T")[0];
+  const recentActivity = recentChanges.filter(
+    (job) => job.updatedAt?.toISOString().split("T")[0] === today
+  );
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">

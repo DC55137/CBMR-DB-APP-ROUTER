@@ -43,11 +43,14 @@ export async function addJob(formData: FormData) {
 
   let { name, email, mobile, address, notes, stage } = validatedFields.data;
 
-  // Remove "mailto:" and colon from email
-  email = email.replace(/^mailto:/, "");
-
-  // Remove "tel:" and colon from mobile
-  mobile = mobile.replace(/^tel:/, "");
+  if (email) {
+    // Remove "mailto:" and colon from email
+    email = email.replace(/^mailto:/, "");
+  }
+  if (mobile) {
+    // Remove "tel:" and colon from mobile
+    mobile = mobile.replace(/^tel:/, "");
+  }
 
   try {
     // Find the highest job number
