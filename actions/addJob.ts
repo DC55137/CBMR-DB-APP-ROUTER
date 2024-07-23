@@ -41,7 +41,14 @@ export async function addJob(formData: FormData) {
     return { error: validatedFields.error.flatten().fieldErrors };
   }
 
-  let { name, email, mobile, address, notes, stage } = validatedFields.data;
+  let {
+    name,
+    email = "",
+    mobile = "",
+    address = "",
+    notes = "",
+    stage,
+  } = validatedFields.data;
 
   if (email) {
     // Remove "mailto:" and colon from email
