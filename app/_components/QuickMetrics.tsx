@@ -1,6 +1,4 @@
 // components/dashboard/QuickMetrics.tsx
-"use client";
-
 import { Job, JobStage } from "@prisma/client";
 import { Calendar, Users, TrendingUp, Clock } from "lucide-react";
 

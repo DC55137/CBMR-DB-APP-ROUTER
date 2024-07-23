@@ -1,5 +1,4 @@
 // components/dashboard/RecentActivity.tsx
-"use client";
 
 import { Job } from "@prisma/client";
 import Link from "next/link";
