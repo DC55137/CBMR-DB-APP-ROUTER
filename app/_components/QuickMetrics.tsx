@@ -2,7 +2,7 @@
 "use client";
 
 import { Job, JobStage } from "@prisma/client";
-import { Calendar, Users, Clock, TrendingUp } from "lucide-react";
+import { Calendar, Users, TrendingUp, Clock } from "lucide-react";
 
 interface QuickMetricsProps {
   jobs: Job[];
@@ -13,10 +13,14 @@ export default function QuickMetrics({ jobs, jobCounts }: QuickMetricsProps) {
   const getThisWeekJobsCount = () => {
     const today = new Date();
     const startOfWeek = new Date(
-      today.setDate(today.getDate() - today.getDay())
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - today.getDay()
     );
     const endOfWeek = new Date(
-      today.setDate(today.getDate() - today.getDay() + 6)
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - today.getDay() + 6
     );
     return jobs.filter(
       (job) =>
@@ -31,7 +35,7 @@ export default function QuickMetrics({ jobs, jobCounts }: QuickMetricsProps) {
       .filter(
         (job) => new Date(job.date) >= startOfMonth && job.stage === "completed"
       )
-      .reduce((total, job) => total + (job.invoiceAmount || 0), 0)
+      .reduce((total, job) => total + (job.quotedPrice || 0), 0)
       .toFixed(2);
   };
 
@@ -42,8 +46,11 @@ export default function QuickMetrics({ jobs, jobCounts }: QuickMetricsProps) {
     if (completedJobs.length === 0) return "N/A";
     const totalDuration = completedJobs.reduce((total, job) => {
       const duration =
-        (new Date(job.endDate).getTime() - new Date(job.startDate).getTime()) /
-        (1000 * 3600 * 24);
+        job.endDate && job.startDate
+          ? (new Date(job.endDate).getTime() -
+              new Date(job.startDate).getTime()) /
+            (1000 * 3600 * 24)
+          : 0;
       return total + duration;
     }, 0);
     return (totalDuration / completedJobs.length).toFixed(1);
@@ -56,7 +63,7 @@ export default function QuickMetrics({ jobs, jobCounts }: QuickMetricsProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Calendar className="mr-2 text-blue-400" />
-            <p>This Week's Jobs</p>
+            <p>This Week&apos;s Jobs</p>
           </div>
           <span className="font-bold">{getThisWeekJobsCount()}</span>
         </div>

@@ -64,6 +64,11 @@ export default function JobGeneral({ job }: JobGeneralProps) {
       <h1 className="my-2 mb-4 text-2xl text-white">
         Job {job.number} - {job.name}
       </h1>
+      {job.date && (
+        <p className="text-sm text-gray-400 mb-4">
+          Created {new Date(job.date).toLocaleDateString()}
+        </p>
+      )}
       <div className="mx-auto grid w-[1000px] rounded-md bg-slate-800 p-10">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-x-4">

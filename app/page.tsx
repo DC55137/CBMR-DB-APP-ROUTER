@@ -19,18 +19,9 @@ export default async function Home() {
     return counts;
   }, {} as JobCounts);
 
-  const recentJobs = jobs.slice(0, 5);
-  const completionRate =
-    jobs.length > 0
-      ? ((Number(jobCounts.completed || 0) / jobs.length) * 100).toFixed(2)
-      : "0";
-
-  const averageJobsPerDay = (() => {
-    const days = new Set(
-      jobs.map((job) => job.date.toISOString().split("T")[0])
-    ).size;
-    return days > 0 ? (jobs.length / days).toFixed(2) : "0";
-  })();
+  const recentJobs = jobs.slice(-10, -1);
+  const recentChanges = jobs.filter((job) => job.updatedAt !== null);
+  const recentActivity = recentChanges.slice(-10, -1);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -43,7 +34,7 @@ export default async function Home() {
               <JobStagePieChart jobCounts={jobCounts} />
 
               <Suspense fallback={<div>Loading recent activity...</div>}>
-                <RecentActivity recentJobs={recentJobs} />
+                <RecentActivity recentJobs={recentActivity} />
               </Suspense>
 
               <Suspense fallback={<div>Loading quick metrics...</div>}>

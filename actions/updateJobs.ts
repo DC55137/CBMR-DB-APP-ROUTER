@@ -1,14 +1,14 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Job } from "@prisma/client";
+import { Job, JobStage } from "@prisma/client";
 
 export default async function updateJobs({
   jobs,
   stage,
 }: {
   jobs: Job[];
-  stage: string;
+  stage: JobStage;
 }) {
   const updatePromises = jobs.map((job) => {
     return prisma.job.update({

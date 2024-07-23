@@ -42,6 +42,8 @@ model Job {
   invoices    Invoice[] // Relation to Invoice model
   startDate   DateTime?
   endDate     DateTime?
+  quotedPrice  Float?
+  updatedAt   DateTime?  @updatedAt
 }
 
 model Invoice {
