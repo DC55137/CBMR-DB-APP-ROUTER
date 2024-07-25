@@ -5,6 +5,8 @@ const navigation = [
   { name: "Jobs", href: `${PATH_JOB.root}`, current: false },
   { name: "Bills", href: `${PATH_PAGE.bills}`, current: false },
   { name: "Calendar", href: `${PATH_PAGE.calendar}`, current: false },
+  { name: "Todo", href: `${PATH_PAGE.todo}`, current: false },
+  { name: "Rates", href: `${PATH_PAGE.rates}`, current: false },
 ];
 
 const headLabel = [

@@ -19,6 +19,8 @@ export const PATH_PAGE = {
   about: "/about",
   bills: "/bills",
   calendar: "/calendar",
+  todo: "/todo",
+  rates: "/rates",
 };
 
 export const PATH_JOB = {

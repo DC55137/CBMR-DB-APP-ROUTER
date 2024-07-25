@@ -1,10 +1,15 @@
+// app/actions/getJob.ts
 "use server";
-import prisma from "@/lib/prisma";
 
-export default async function getJobs() {
-  const jobs = await prisma.job.findMany({});
-  if (!jobs) {
-    throw new Error("Jobs not found");
+import prisma from "@/lib/prisma";
+import { Job } from "@prisma/client";
+
+export default async function getJobs(): Promise<Job[] | null> {
+  try {
+    const jobs = await prisma.job.findMany({});
+    return jobs;
+  } catch (error) {
+    console.error("Failed to fetch job:", error);
+    return null;
   }
-  return jobs;
 }

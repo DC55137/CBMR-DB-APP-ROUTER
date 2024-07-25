@@ -16,6 +16,7 @@ const InvoiceSchema = z.object({
   dueDate: z.date(),
   status: z.nativeEnum(InvoiceStatus),
   invoiceImage: z.string().optional(),
+  company: z.string(),
 });
 
 type InvoiceInput = z.infer<typeof InvoiceSchema>;
@@ -43,6 +44,7 @@ export async function addInvoice(
     dueDate,
     status,
     invoiceImage,
+    company,
   } = validatedFields.data;
 
   try {
@@ -66,6 +68,7 @@ export async function addInvoice(
         dueDate,
         status,
         invoiceImage,
+        company,
       },
     });
 

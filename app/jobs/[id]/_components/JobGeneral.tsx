@@ -8,9 +8,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "react-toastify";
-import { Job, JobStage } from "@prisma/client";
+import { Job, JobStage, Prisma } from "@prisma/client";
 import TextField from "./TextField";
 import { updateJob } from "@/actions/updateJob";
+import OriginalAdImage from "./OriginalAdImage";
 
 interface JobGeneralProps {
   job: Job;
@@ -19,11 +20,11 @@ interface JobGeneralProps {
 const UpdateJobSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Name is required"),
-  email: z.string().email().optional().or(z.literal("")),
-  mobile: z.string().optional(),
+  email: z.string().email().nullable(),
+  mobile: z.string().nullable(),
   stage: z.nativeEnum(JobStage),
-  address: z.string().optional(),
-  notes: z.string().optional(),
+  address: z.string().nullable(),
+  notes: z.string().nullable(),
 });
 
 type UpdateJobFormData = z.infer<typeof UpdateJobSchema>;
@@ -38,14 +39,33 @@ export default function JobGeneral({ job }: JobGeneralProps) {
     formState: { errors },
   } = useForm<UpdateJobFormData>({
     resolver: zodResolver(UpdateJobSchema),
-    defaultValues: job,
+    defaultValues: {
+      id: job.id,
+      name: job.name,
+      email: job.email,
+      mobile: job.mobile,
+      stage: job.stage,
+      address: job.address,
+      notes: job.notes,
+    },
   });
 
-  const onSubmit = async (data: UpdateJobFormData) => {
+  const onSubmit = async (formData: UpdateJobFormData) => {
     setLoading(true);
     toast("Updating job...");
     try {
-      const result = await updateJob(data);
+      const updateData: Prisma.JobUpdateInput & { id: string } = {
+        id: formData.id,
+        name: formData.name,
+        email: formData.email === null ? { set: undefined } : formData.email,
+        mobile: formData.mobile === null ? { set: undefined } : formData.mobile,
+        stage: formData.stage,
+        address:
+          formData.address === null ? { set: undefined } : formData.address,
+        notes: formData.notes === null ? { set: undefined } : formData.notes,
+      };
+
+      const result = await updateJob(updateData);
       if (result.success) {
         toast.success("Job updated successfully");
         router.refresh();
@@ -151,6 +171,9 @@ export default function JobGeneral({ job }: JobGeneralProps) {
           </div>
         </form>
       </div>
+
+      {/* Original Ad Image component */}
+      <OriginalAdImage jobId={job.id} initialImage={job.originalAdImage} />
     </div>
   );
 }

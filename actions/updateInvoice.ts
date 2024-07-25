@@ -9,8 +9,13 @@ import { InvoiceStatus } from "@prisma/client";
 
 const UpdateInvoiceSchema = z.object({
   id: z.string().min(1, "Invoice ID is required"),
-  status: z.nativeEnum(InvoiceStatus),
-  // Add other fields that can be updated if needed
+  company: z.string().optional(),
+  amount: z.number().optional(),
+  description: z.string().optional(),
+  issueDate: z.date().optional(),
+  dueDate: z.date().optional(),
+  status: z.nativeEnum(InvoiceStatus).optional(),
+  invoiceImage: z.string().nullable().optional(),
 });
 
 type UpdateInvoiceInput = z.infer<typeof UpdateInvoiceSchema>;
@@ -20,6 +25,7 @@ export async function updateInvoice(
 ): Promise<
   { success: true; invoice: any } | { success: false; error: string }
 > {
+  console.log("data", data);
   const validatedFields = UpdateInvoiceSchema.safeParse(data);
 
   if (!validatedFields.success) {
@@ -29,12 +35,12 @@ export async function updateInvoice(
     };
   }
 
-  const { id, status } = validatedFields.data;
+  const { id, ...updateData } = validatedFields.data;
 
   try {
     const updatedInvoice = await prisma.invoice.update({
       where: { id },
-      data: { status },
+      data: updateData,
     });
 
     const job = await prisma.job.findUnique({

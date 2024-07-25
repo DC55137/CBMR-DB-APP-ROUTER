@@ -1,20 +1,23 @@
 // app/page.tsx
 import { Suspense } from "react";
-import getJobs from "@/actions/getJobs";
 import { JobStage } from "@prisma/client";
 import { JobStagePieChart } from "@/components/ui/JobStagePieChart";
 import Link from "next/link";
 import { PATH_JOB, PATH_PAGE } from "@/routes/path";
 import { Briefcase, FileText, PlusCircle, Calendar } from "lucide-react";
 import RecentActivity from "./_components/RecentActivity";
-import QuickMetrics from "./_components/QuickMetrics";
+
 import ScheduledJobs from "./_components/ScheduledJobs";
 import InspectJobs from "./_components/InspectJobs";
+import DashboardTodoList from "./_components/DashboardTodoList";
+import prisma from "@/lib/prisma";
+import updateTodo from "@/actions/updateTodo";
 
 type JobCounts = Partial<Record<JobStage, number>>;
 
 export default async function Home() {
-  const jobs = await getJobs();
+  const jobs = await prisma.job.findMany();
+  const todos = await prisma.todo.findMany();
 
   const jobCounts: JobCounts = jobs.reduce((counts, job) => {
     counts[job.stage] = (counts[job.stage] || 0) + 1;
@@ -46,7 +49,7 @@ export default async function Home() {
             <div className="lg:col-span-2 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <JobStagePieChart jobCounts={jobCounts} />
-                <QuickMetrics jobs={jobs} jobCounts={jobCounts} />
+                <DashboardTodoList todos={todos} />
               </div>
 
               <Suspense fallback={<div>Loading scheduled jobs...</div>}>

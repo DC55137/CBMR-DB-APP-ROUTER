@@ -10,16 +10,19 @@ import { Job, Invoice, InvoiceStatus } from "@prisma/client";
 import TextField from "./TextField";
 import { format } from "date-fns";
 import { addInvoice } from "@/actions/addInvoice";
+import { updateInvoice } from "@/actions/updateInvoice";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
-import { updateInvoice } from "@/actions/updateInvoice";
+import { useRouter } from "next/navigation";
+import { deleteInvoice } from "@/actions/deleteInvoice";
+import { X } from "lucide-react";
 
 interface JobInvoiceProps {
   job: Job & { invoices: Invoice[] };
 }
 
-const AddInvoiceSchema = z.object({
-  invoiceNumber: z.string().min(1, "Invoice number is required"),
+const InvoiceSchema = z.object({
+  company: z.string().min(1, "Company is required"),
   amount: z.string().min(1, "Amount is required"),
   description: z.string().optional(),
   issueDate: z.string().min(1, "Issue date is required"),
@@ -27,21 +30,25 @@ const AddInvoiceSchema = z.object({
   status: z.nativeEnum(InvoiceStatus),
 });
 
-type AddInvoiceFormData = z.infer<typeof AddInvoiceSchema>;
+type InvoiceFormData = z.infer<typeof InvoiceSchema>;
 
-export default function JobInvoice({ job }: JobInvoiceProps) {
+export default function JobInvoice({ job: initialJob }: JobInvoiceProps) {
+  const [job, setJob] = useState(initialJob);
   const [loading, setLoading] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [invoiceImage, setInvoiceImage] = useState("");
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const router = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<AddInvoiceFormData>({
-    resolver: zodResolver(AddInvoiceSchema),
+    setValue,
+  } = useForm<InvoiceFormData>({
+    resolver: zodResolver(InvoiceSchema),
     defaultValues: {
       issueDate: format(new Date(), "yyyy-MM-dd"),
       dueDate: format(new Date(), "yyyy-MM-dd"),
@@ -55,34 +62,76 @@ export default function JobInvoice({ job }: JobInvoiceProps) {
     toast.success("Invoice image uploaded successfully");
   };
 
-  const onSubmit = async (data: AddInvoiceFormData) => {
-    setLoading(true);
-    toast("Adding invoice...");
-    try {
-      const result = await addInvoice({
-        ...data,
-        jobId: job.id,
-        amount: parseFloat(data.amount),
-        issueDate: new Date(data.issueDate),
-        dueDate: new Date(data.dueDate),
-        invoiceImage: invoiceImage,
-      });
+  const getNextInvoiceNumber = () => {
+    const maxInvoiceNumber = job.invoices.reduce((max, invoice) => {
+      const currentNumber = parseInt(invoice.invoiceNumber);
+      return currentNumber > max ? currentNumber : max;
+    }, 0);
+    return (maxInvoiceNumber + 1).toString().padStart(3, "0");
+  };
 
-      if ("success" in result && result.success) {
-        toast.success("Invoice added successfully");
-        reset();
-        setShowAddForm(false);
-        setInvoiceImage("");
-        // You might want to refresh the job data here to show the new invoice
-      } else {
-        const errorMessage =
-          "error" in result
-            ? typeof result.error === "string"
-              ? result.error
-              : "Failed to add invoice"
-            : "Failed to add invoice";
-        toast.error(errorMessage);
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (window.confirm("Are you sure you want to delete this invoice?")) {
+      try {
+        const result = await deleteInvoice(invoiceId);
+        if (result.success) {
+          toast.success("Invoice deleted successfully");
+          setJob((prevJob) => ({
+            ...prevJob,
+            invoices: prevJob.invoices.filter((inv) => inv.id !== invoiceId),
+          }));
+          router.refresh();
+        } else {
+          toast.error(result.error || "Failed to delete invoice");
+        }
+      } catch (error) {
+        console.error("Error deleting invoice:", error);
+        toast.error("An error occurred while deleting the invoice");
       }
+    }
+  };
+
+  const onSubmit = async (data: InvoiceFormData) => {
+    setLoading(true);
+    try {
+      if (editingInvoice) {
+        const result = await updateInvoice({
+          id: editingInvoice.id,
+          company: data.company,
+          amount: parseFloat(data.amount),
+          description: data.description,
+          issueDate: new Date(data.issueDate),
+          dueDate: new Date(data.dueDate),
+          status: data.status,
+          invoiceImage: invoiceImage || editingInvoice.invoiceImage,
+        });
+        if (result.success) {
+          toast.success("Invoice updated successfully");
+        } else {
+          toast.error("Failed to update invoice");
+        }
+      } else {
+        const invoiceNumber = getNextInvoiceNumber();
+        const result = await addInvoice({
+          ...data,
+          jobId: job.id,
+          invoiceNumber,
+          amount: parseFloat(data.amount),
+          issueDate: new Date(data.issueDate),
+          dueDate: new Date(data.dueDate),
+          invoiceImage: invoiceImage,
+        });
+        if ("success" in result && result.success) {
+          toast.success("Invoice added successfully");
+        } else {
+          toast.error("Failed to add invoice");
+        }
+      }
+      reset();
+      setShowForm(false);
+      setInvoiceImage("");
+      setEditingInvoice(null);
+      // You might want to refresh the job data here to show the new/updated invoice
     } catch (err) {
       console.error(err);
       toast.error("An error occurred");
@@ -105,17 +154,29 @@ export default function JobInvoice({ job }: JobInvoiceProps) {
         invoice.status === InvoiceStatus.PAID
           ? InvoiceStatus.PENDING
           : InvoiceStatus.PAID;
-      const result = await updateInvoice({ ...invoice, status: newStatus });
+      const result = await updateInvoice({ id: invoice.id, status: newStatus });
       if (result.success) {
         toast.success(`Invoice status updated to ${newStatus}`);
-        // You might want to refresh the job data here to show the updated invoice status
+        router.refresh();
       } else {
-        toast.error("Failed to update invoice status");
+        toast.error(result.error || "Failed to update invoice status");
       }
     } catch (error) {
       console.error("Error updating invoice status:", error);
       toast.error("An error occurred while updating the invoice status");
     }
+  };
+
+  const handleEditInvoice = (invoice: Invoice) => {
+    setEditingInvoice(invoice);
+    setShowForm(true);
+    setValue("company", invoice.company);
+    setValue("amount", invoice.amount.toString());
+    setValue("description", invoice.description || "");
+    setValue("issueDate", format(new Date(invoice.issueDate), "yyyy-MM-dd"));
+    setValue("dueDate", format(new Date(invoice.dueDate), "yyyy-MM-dd"));
+    setValue("status", invoice.status);
+    setInvoiceImage(invoice.invoiceImage || "");
   };
 
   return (
@@ -133,8 +194,8 @@ export default function JobInvoice({ job }: JobInvoiceProps) {
               <thead>
                 <tr className="bg-slate-700">
                   <th className="p-2">Invoice Number</th>
+                  <th className="p-2">Company</th>
                   <th className="p-2">Amount</th>
-                  <th className="p-2">Issue Date</th>
                   <th className="p-2">Due Date</th>
                   <th className="p-2">Status</th>
                   <th className="p-2">Actions</th>
@@ -144,10 +205,8 @@ export default function JobInvoice({ job }: JobInvoiceProps) {
                 {job.invoices.map((invoice) => (
                   <tr key={invoice.id} className="bg-slate-800">
                     <td className="p-2">{invoice.invoiceNumber}</td>
+                    <td className="p-2">{invoice.company}</td>
                     <td className="p-2">${invoice.amount.toFixed(2)}</td>
-                    <td className="p-2">
-                      {format(new Date(invoice.issueDate), "dd/MM/yyyy")}
-                    </td>
                     <td className="p-2">
                       {format(new Date(invoice.dueDate), "dd/MM/yyyy")}
                     </td>
@@ -162,26 +221,40 @@ export default function JobInvoice({ job }: JobInvoiceProps) {
                         {invoice.status}
                       </span>
                     </td>
-                    <td className="p-2">
-                      {invoice.invoiceImage && (
+                    <td className="p-2 flex justify-between">
+                      <div>
                         <button
-                          onClick={() => handleShowPaymentDetails(invoice)}
+                          onClick={() => handleEditInvoice(invoice)}
                           className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
                         >
-                          Details
+                          Edit
                         </button>
-                      )}
+                        {invoice.invoiceImage && (
+                          <button
+                            onClick={() => handleShowPaymentDetails(invoice)}
+                            className="bg-purple-500 text-white px-2 py-1 rounded mr-2 hover:bg-purple-600"
+                          >
+                            Details
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleChangeStatus(invoice)}
+                          className={`text-white px-2 py-1 rounded ${
+                            invoice.status === InvoiceStatus.PAID
+                              ? "bg-yellow-500 hover:bg-yellow-600"
+                              : "bg-green-500 hover:bg-green-600"
+                          }`}
+                        >
+                          {invoice.status === InvoiceStatus.PAID
+                            ? "Mark Unpaid"
+                            : "Mark Paid"}
+                        </button>
+                      </div>
                       <button
-                        onClick={() => handleChangeStatus(invoice)}
-                        className={`text-white px-2 py-1 rounded ${
-                          invoice.status === InvoiceStatus.PAID
-                            ? "bg-yellow-500 hover:bg-yellow-600"
-                            : "bg-green-500 hover:bg-green-600"
-                        }`}
+                        onClick={() => handleDeleteInvoice(invoice.id)}
+                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                       >
-                        {invoice.status === InvoiceStatus.PAID
-                          ? "Mark Unpaid"
-                          : "Mark Paid"}
+                        <X className="w-4 h-4 " />
                       </button>
                     </td>
                   </tr>
@@ -220,24 +293,35 @@ export default function JobInvoice({ job }: JobInvoiceProps) {
         </div>
       )}
 
-      {/* Add Invoice Button */}
+      {/* Add/Edit Invoice Button */}
       <button
-        onClick={() => setShowAddForm(!showAddForm)}
+        onClick={() => {
+          setShowForm(!showForm);
+          if (!showForm) {
+            reset();
+            setEditingInvoice(null);
+            setInvoiceImage("");
+          }
+        }}
         className="mb-4 bg-main-500 text-white px-4 py-2 rounded hover:bg-main-600"
       >
-        {showAddForm ? "Cancel" : "Add New Invoice"}
+        {showForm
+          ? "Cancel"
+          : editingInvoice
+          ? "Edit Invoice"
+          : "Add New Invoice"}
       </button>
 
-      {/* Add Invoice Form */}
-      {showAddForm && (
+      {/* Add/Edit Invoice Form */}
+      {showForm && (
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-slate-800 p-6 rounded-md"
         >
           <div className="grid grid-cols-2 gap-4">
             <TextField
-              title="Invoice Number"
-              name="invoiceNumber"
+              title="Company"
+              name="company"
               register={register}
               errors={errors}
             />
@@ -332,7 +416,11 @@ export default function JobInvoice({ job }: JobInvoiceProps) {
             disabled={loading}
             className="mt-4 w-full bg-main-500 text-white px-4 py-2 rounded hover:bg-main-600 disabled:opacity-50"
           >
-            {loading ? "Adding..." : "Add Invoice"}
+            {loading
+              ? "Saving..."
+              : editingInvoice
+              ? "Update Invoice"
+              : "Add Invoice"}
           </button>
         </form>
       )}

@@ -3,30 +3,20 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { Job, JobStage } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
-export async function updateJob(data: Partial<Job>) {
+type JobUpdateData = Prisma.JobUpdateInput & { id: string };
+
+export async function updateJob(data: JobUpdateData) {
+  const { id, ...updateData } = data;
   try {
     const updatedJob = await prisma.job.update({
-      where: { id: data.id },
-      data: {
-        name: data.name,
-        email: data.email,
-        mobile: data.mobile,
-        stage: data.stage as JobStage,
-        address: data.address,
-        notes: data.notes,
-        quoteImage: data.quoteImage,
-        image1: data.image1,
-        image2: data.image2,
-        image3: data.image3,
-        image4: data.image4,
-        // Add other fields as necessary
-      },
+      where: { id },
+      data: updateData,
     });
 
     revalidatePath("/jobs");
-    revalidatePath(`/job/${data.id}`);
+    revalidatePath(`/job/${id}`);
 
     return { success: true, job: updatedJob };
   } catch (error) {

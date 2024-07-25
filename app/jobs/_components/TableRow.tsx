@@ -54,10 +54,9 @@ export default function TableRow({
     name: string;
   }) {
     name = name.replace(/\s/g, "");
-    return `/Users/cbroofing/Library/Mobile Documents/com~apple~CloudDocs/Documents/CBRoofing/Jobs/all/${number}-${name}`;
+    return `${number}-${name}`;
   }
 
-  const jobFolderName = jobFolder(row);
   const jobFolderLocationString = jobFolderLocation(row);
 
   return (
