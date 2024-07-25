@@ -17,10 +17,9 @@ import updateJobs from "@/actions/updateJobs";
 
 interface TableProps {
   initialJobs: Job[];
-  showExtra: boolean;
 }
 
-export default function Table({ initialJobs, showExtra }: TableProps) {
+export default function Table({ initialJobs }: TableProps) {
   const [showColumn, setShowColumn] = useState(true);
   const { jobs, setJobs, updateJobRows } = useJobStore();
 

@@ -5,6 +5,10 @@ import Table from "./_components/Table";
 export default async function JobPage() {
   const jobs = await getJobs();
 
+  if (!jobs) {
+    return <div>Failed to load jobs</div>;
+  }
+
   return (
     <div className="min-h-full bg-main-1">
       <main className="pb-10">
@@ -12,7 +16,7 @@ export default async function JobPage() {
           <h1 className="text-2xl sm:text-3xl font-semibold text-white mb-6">
             Jobs
           </h1>
-          <Table initialJobs={jobs} showExtra={false} />
+          <Table initialJobs={jobs} />
         </div>
       </main>
     </div>
