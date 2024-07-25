@@ -34,8 +34,8 @@ export default async function Home() {
   const inspectJobs = jobs.filter((job) => job.stage === "inspect");
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <main className="pb-10 bg-gray-900">
+    <div className="min-h-screen bg-main-1 text-white">
+      <main className="pb-10 bg-main-1">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-8 sm:my-12 lg:my-20">
           <h1 className="text-2xl sm:text-3xl font-semibold mb-6 sm:mb-8">
             Dashboard

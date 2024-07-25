@@ -62,6 +62,7 @@ model Invoice {
   dueDate        DateTime
   status         InvoiceStatus @default(PENDING)
   paymentDetails String?       // This will store the image as a string (likely a URL or base64)
+  invoiceImage   String?       // Add this line
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 }

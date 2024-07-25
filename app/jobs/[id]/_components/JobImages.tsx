@@ -62,22 +62,26 @@ export default function JobImages({ job }: JobImagesProps) {
   };
 
   return (
-    <div className="mx-auto w-full md:w-[1000px]">
+    <div className="w-full max-w-[1500px] mx-auto">
       <h2 className="my-2 mb-4 text-2xl text-white">Job Images</h2>
-      <div className="mx-auto grid grid-cols-2 gap-4 rounded-md bg-slate-800 p-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 rounded-md bg-slate-800">
         {(["image1", "image2", "image3", "image4"] as const).map((imageKey) => (
-          <div key={imageKey} className="relative h-[300px] w-full">
+          <div
+            key={imageKey}
+            className="relative w-full h-[calc(100vw-1rem)] sm:h-[calc(100vw-10rem)] lg:h-[600px]"
+          >
             {images[imageKey] ? (
               <>
                 <Image
                   src={images[imageKey]!}
                   alt={`Job ${imageKey}`}
                   layout="fill"
-                  objectFit="cover"
+                  objectFit="contain"
+                  className="absolute top-0 left-0 w-full h-full"
                 />
                 <button
                   onClick={() => handleDeleteImage(imageKey)}
-                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm"
+                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm z-10"
                 >
                   Delete
                 </button>
@@ -90,7 +94,7 @@ export default function JobImages({ job }: JobImagesProps) {
                 {({ open }) => (
                   <button
                     onClick={() => open()}
-                    className="w-full h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:border-white transition-colors duration-300"
+                    className="absolute top-0 left-0 w-full h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:border-white transition-colors duration-300"
                   >
                     <span>Upload {imageKey}</span>
                   </button>

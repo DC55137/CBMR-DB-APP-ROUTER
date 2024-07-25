@@ -27,7 +27,7 @@ export default function ScheduledJobs({ jobs }: ScheduledJobsProps) {
           <thead>
             <tr className="text-left text-sm font-medium text-gray-400">
               <th className="pb-2">Name</th>
-              <th className="pb-2">Date</th>
+              <th className="pb-2">Received</th>
               <th className="pb-2">Time</th>
               <th className="pb-2">Address</th>
               <th className="pb-2">Contact</th>

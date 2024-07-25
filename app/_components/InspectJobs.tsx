@@ -3,7 +3,7 @@ import { Job } from "@prisma/client";
 import Link from "next/link";
 import { PATH_JOB } from "@/routes/path";
 import { format } from "date-fns";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Phone } from "lucide-react";
 
 interface InspectJobsProps {
   jobs: Job[];
@@ -27,8 +27,9 @@ export default function InspectJobs({ jobs }: InspectJobsProps) {
           <thead>
             <tr className="text-left text-sm font-medium text-gray-400">
               <th className="pb-2">Name</th>
-              <th className="pb-2">Date</th>
+              <th className="pb-2">Received</th>
               <th className="pb-2">Address</th>
+              <th className="pb-2">Contact</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
@@ -52,6 +53,12 @@ export default function InspectJobs({ jobs }: InspectJobsProps) {
                   <div className="flex items-center text-sm">
                     <MapPin className="mr-2 text-green-400" size={16} />
                     {job.address}
+                  </div>
+                </td>
+                <td className="py-3">
+                  <div className="flex items-center text-sm">
+                    <Phone className="mr-2 text-purple-400" size={16} />
+                    {job.mobile}
                   </div>
                 </td>
               </tr>

@@ -23,7 +23,7 @@ export default function RootLayout({
       className="h-full scroll-smooth bg-white antialiased [font-feature-settings:'ss01']"
     >
       <body
-        className={`${inter.className} ${lexend.className} flex h-full flex-col`}
+        className={`${inter.className} ${lexend.className} flex h-full flex-col min-h-screen bg-main-1`}
       >
         <ToastContainer autoClose={2000} />
         <div className="bg-main-2">

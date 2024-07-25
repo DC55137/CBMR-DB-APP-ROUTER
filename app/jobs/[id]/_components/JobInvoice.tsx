@@ -1,0 +1,341 @@
+// components/JobInvoice.tsx
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "react-toastify";
+import { Job, Invoice, InvoiceStatus } from "@prisma/client";
+import TextField from "./TextField";
+import { format } from "date-fns";
+import { addInvoice } from "@/actions/addInvoice";
+import { CldUploadWidget } from "next-cloudinary";
+import Image from "next/image";
+import { updateInvoice } from "@/actions/updateInvoice";
+
+interface JobInvoiceProps {
+  job: Job & { invoices: Invoice[] };
+}
+
+const AddInvoiceSchema = z.object({
+  invoiceNumber: z.string().min(1, "Invoice number is required"),
+  amount: z.string().min(1, "Amount is required"),
+  description: z.string().optional(),
+  issueDate: z.string().min(1, "Issue date is required"),
+  dueDate: z.string().min(1, "Due date is required"),
+  status: z.nativeEnum(InvoiceStatus),
+});
+
+type AddInvoiceFormData = z.infer<typeof AddInvoiceSchema>;
+
+export default function JobInvoice({ job }: JobInvoiceProps) {
+  const [loading, setLoading] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [invoiceImage, setInvoiceImage] = useState("");
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<AddInvoiceFormData>({
+    resolver: zodResolver(AddInvoiceSchema),
+    defaultValues: {
+      issueDate: format(new Date(), "yyyy-MM-dd"),
+      dueDate: format(new Date(), "yyyy-MM-dd"),
+      status: InvoiceStatus.PENDING,
+    },
+  });
+
+  const handleUploadSuccess = (result: any) => {
+    const imageUrl = result.info.secure_url;
+    setInvoiceImage(imageUrl);
+    toast.success("Invoice image uploaded successfully");
+  };
+
+  const onSubmit = async (data: AddInvoiceFormData) => {
+    setLoading(true);
+    toast("Adding invoice...");
+    try {
+      const result = await addInvoice({
+        ...data,
+        jobId: job.id,
+        amount: parseFloat(data.amount),
+        issueDate: new Date(data.issueDate),
+        dueDate: new Date(data.dueDate),
+        invoiceImage: invoiceImage,
+      });
+
+      if ("success" in result && result.success) {
+        toast.success("Invoice added successfully");
+        reset();
+        setShowAddForm(false);
+        setInvoiceImage("");
+        // You might want to refresh the job data here to show the new invoice
+      } else {
+        const errorMessage =
+          "error" in result
+            ? typeof result.error === "string"
+              ? result.error
+              : "Failed to add invoice"
+            : "Failed to add invoice";
+        toast.error(errorMessage);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShowPaymentDetails = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+  };
+
+  const handleClosePaymentDetails = () => {
+    setSelectedInvoice(null);
+  };
+
+  const handleChangeStatus = async (invoice: Invoice) => {
+    try {
+      const newStatus =
+        invoice.status === InvoiceStatus.PAID
+          ? InvoiceStatus.PENDING
+          : InvoiceStatus.PAID;
+      const result = await updateInvoice({ ...invoice, status: newStatus });
+      if (result.success) {
+        toast.success(`Invoice status updated to ${newStatus}`);
+        // You might want to refresh the job data here to show the updated invoice status
+      } else {
+        toast.error("Failed to update invoice status");
+      }
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
+      toast.error("An error occurred while updating the invoice status");
+    }
+  };
+
+  return (
+    <div className="mx-auto w-full md:w-[1000px]">
+      <h1 className="my-2 mb-4 text-2xl text-white">
+        Invoices for Job {job.number}
+      </h1>
+
+      {/* Existing Invoices */}
+      {job.invoices.length > 0 ? (
+        <div className="mb-6">
+          <h2 className="text-xl text-white mb-2">Existing Invoices</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-white">
+              <thead>
+                <tr className="bg-slate-700">
+                  <th className="p-2">Invoice Number</th>
+                  <th className="p-2">Amount</th>
+                  <th className="p-2">Issue Date</th>
+                  <th className="p-2">Due Date</th>
+                  <th className="p-2">Status</th>
+                  <th className="p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {job.invoices.map((invoice) => (
+                  <tr key={invoice.id} className="bg-slate-800">
+                    <td className="p-2">{invoice.invoiceNumber}</td>
+                    <td className="p-2">${invoice.amount.toFixed(2)}</td>
+                    <td className="p-2">
+                      {format(new Date(invoice.issueDate), "dd/MM/yyyy")}
+                    </td>
+                    <td className="p-2">
+                      {format(new Date(invoice.dueDate), "dd/MM/yyyy")}
+                    </td>
+                    <td className="p-2">
+                      <span
+                        className={`px-2 py-1 rounded ${
+                          invoice.status === InvoiceStatus.PAID
+                            ? "bg-green-500"
+                            : "bg-yellow-500"
+                        }`}
+                      >
+                        {invoice.status}
+                      </span>
+                    </td>
+                    <td className="p-2">
+                      {invoice.invoiceImage && (
+                        <button
+                          onClick={() => handleShowPaymentDetails(invoice)}
+                          className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
+                        >
+                          Details
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleChangeStatus(invoice)}
+                        className={`text-white px-2 py-1 rounded ${
+                          invoice.status === InvoiceStatus.PAID
+                            ? "bg-yellow-500 hover:bg-yellow-600"
+                            : "bg-green-500 hover:bg-green-600"
+                        }`}
+                      >
+                        {invoice.status === InvoiceStatus.PAID
+                          ? "Mark Unpaid"
+                          : "Mark Paid"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <p className="text-white mb-6">No invoices found for this job.</p>
+      )}
+
+      {selectedInvoice && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-slate-800 p-6 rounded-lg max-w-2xl w-full">
+            <h2 className="text-xl text-white mb-4">Invoice Details</h2>
+            {selectedInvoice.invoiceImage && (
+              <div className="mb-4">
+                <p className="text-white mb-2">Invoice Image:</p>
+                <Image
+                  src={selectedInvoice.invoiceImage}
+                  alt="Invoice"
+                  width={500}
+                  height={500}
+                  objectFit="contain"
+                />
+              </div>
+            )}
+            <button
+              onClick={handleClosePaymentDetails}
+              className="bg-main-500 text-white px-4 py-2 rounded hover:bg-main-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Invoice Button */}
+      <button
+        onClick={() => setShowAddForm(!showAddForm)}
+        className="mb-4 bg-main-500 text-white px-4 py-2 rounded hover:bg-main-600"
+      >
+        {showAddForm ? "Cancel" : "Add New Invoice"}
+      </button>
+
+      {/* Add Invoice Form */}
+      {showAddForm && (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="bg-slate-800 p-6 rounded-md"
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <TextField
+              title="Invoice Number"
+              name="invoiceNumber"
+              register={register}
+              errors={errors}
+            />
+            <TextField
+              title="Amount"
+              name="amount"
+              type="number"
+              step="0.01"
+              min="0"
+              register={register}
+              errors={errors}
+            />
+            <TextField
+              title="Description"
+              name="description"
+              register={register}
+              errors={errors}
+            />
+            <TextField
+              title="Issue Date"
+              name="issueDate"
+              type="date"
+              register={register}
+              errors={errors}
+            />
+            <TextField
+              title="Due Date"
+              name="dueDate"
+              type="date"
+              register={register}
+              errors={errors}
+            />
+            <div>
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-white"
+              >
+                Status
+              </label>
+              <select
+                {...register("status")}
+                className="mt-1 block w-full rounded-md bg-slate-700 text-white py-2 px-3"
+              >
+                {Object.values(InvoiceStatus).map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Invoice Image Upload */}
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-white mb-2">
+                Invoice Image
+              </label>
+              {invoiceImage ? (
+                <div className="relative h-64 w-full mb-4">
+                  <Image
+                    src={invoiceImage}
+                    alt="Invoice Image"
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setInvoiceImage("")}
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <CldUploadWidget
+                  uploadPreset="invoice_images"
+                  onSuccess={handleUploadSuccess}
+                >
+                  {({ open }) => (
+                    <button
+                      type="button"
+                      onClick={() => open()}
+                      className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:border-white transition-colors duration-300"
+                    >
+                      <span>Click or drag to upload invoice image</span>
+                    </button>
+                  )}
+                </CldUploadWidget>
+              )}
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-4 w-full bg-main-500 text-white px-4 py-2 rounded hover:bg-main-600 disabled:opacity-50"
+          >
+            {loading ? "Adding..." : "Add Invoice"}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}

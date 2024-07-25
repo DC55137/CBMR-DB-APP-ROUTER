@@ -2,6 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
+/* app/calendar/CustomCalendar.css */
+.custom-calendar {
+  background-color: #08121d; /* main-1 */
+  color: #edeef0; /* slate-12 */
+}
+
+.custom-calendar .rbc-off-range-bg {
+  background-color: #0d1927; /* main-2 */
+}
+
+.custom-calendar .rbc-today {
+  background-color: #05274a; /* main-3 */
+}
+
+.custom-calendar .rbc-event {
+  background-color: #04549a; /* main-9 */
+  border: none;
+}
+
+.custom-calendar .rbc-event.rbc-selected {
+  background-color: #126cc0; /* main-8 */
+}
+
+.custom-calendar .rbc-toolbar button {
+  color: #edeef0; /* slate-12 */
+  border-color: #373a3f; /* slate-6 */
+}
+
+.custom-calendar .rbc-toolbar button:hover {
+  background-color: #05274a; /* main-3 */
+}
+
+.custom-calendar .rbc-toolbar button.rbc-active {
+  background-color: #04549a; /* main-9 */
+}
+
+.custom-calendar .rbc-header,
+.custom-calendar .rbc-time-view .rbc-header,
+.custom-calendar .rbc-month-view {
+  border-color: #373a3f; /* slate-6 */
+}
+
+.custom-calendar .rbc-day-bg + .rbc-day-bg,
+.custom-calendar .rbc-month-row + .rbc-month-row {
+  border-color: #373a3f; /* slate-6 */
+}
+
+.custom-calendar .rbc-time-content > * + * > *,
+.custom-calendar .rbc-time-view,
+.custom-calendar .rbc-time-header {
+  border-color: #373a3f; /* slate-6 */
+}
+
+.custom-calendar .rbc-day-slot .rbc-time-slot {
+  border-color: #212225; /* slate-3 */
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

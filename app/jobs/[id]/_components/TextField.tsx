@@ -8,6 +8,10 @@ interface TextFieldProps {
   name: string;
   register: UseFormRegister<any>;
   autoComplete?: string;
+  type?: string;
+  step?: string;
+  min?: string;
+  max?: string;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -16,6 +20,10 @@ const TextField: React.FC<TextFieldProps> = ({
   name,
   register,
   autoComplete,
+  type = "text",
+  step,
+  min,
+  max,
 }) => {
   return (
     <div className="col-span-2 sm:col-span-1">
@@ -27,11 +35,14 @@ const TextField: React.FC<TextFieldProps> = ({
       </label>
       <div className="relative mt-1 rounded-md shadow-sm">
         <input
-          type="text"
+          type={type}
           {...register(name)}
           name={name}
           autoComplete={autoComplete}
           id={name}
+          step={step}
+          min={min}
+          max={max}
           className={clsx(
             `block w-full rounded-md bg-slate-700 py-3 text-white hover:border hover:border-main-200 focus:border-main-200 focus:ring-main-200 pl-2`
           )}

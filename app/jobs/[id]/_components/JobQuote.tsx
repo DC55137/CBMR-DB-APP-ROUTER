@@ -53,7 +53,7 @@ export default function JobQuote({ job }: JobQuoteProps) {
   };
 
   return (
-    <div className="mx-auto w-full md:w-[1000px]">
+    <div className="mx-auto w-full md:w-[1000px] ">
       <h2 className="my-2 mb-4 text-2xl text-white">Quote</h2>
       <div className="mx-auto rounded-md bg-slate-800 p-10">
         {quoteImage ? (

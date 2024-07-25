@@ -18,6 +18,7 @@ export const PATH_PAGE = {
   pricing: "/pricing",
   about: "/about",
   bills: "/bills",
+  calendar: "/calendar",
 };
 
 export const PATH_JOB = {

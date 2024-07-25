@@ -4,6 +4,7 @@ import { PATH_JOB, PATH_PAGE } from "@/routes/path";
 const navigation = [
   { name: "Jobs", href: `${PATH_JOB.root}`, current: false },
   { name: "Bills", href: `${PATH_PAGE.bills}`, current: false },
+  { name: "Calendar", href: `${PATH_PAGE.calendar}`, current: false },
 ];
 
 const headLabel = [
