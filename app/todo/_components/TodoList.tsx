@@ -76,7 +76,7 @@ export default function TodoList({ initialTodos }: TodoListProps) {
 
     startTransition(async () => {
       const result = await addTodo(formData);
-      if (result.success) {
+      if (result.success && result.todo) {
         setTodos([result.todo, ...todos]);
         (e.target as HTMLFormElement).reset();
       }
