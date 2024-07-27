@@ -108,6 +108,7 @@ export default function JobInvoice({ job: initialJob }: JobInvoiceProps) {
         if (result.success) {
           toast.success("Invoice updated successfully");
         } else {
+          console.error(result.error);
           toast.error("Failed to update invoice");
         }
       } else {
@@ -124,6 +125,7 @@ export default function JobInvoice({ job: initialJob }: JobInvoiceProps) {
         if ("success" in result && result.success) {
           toast.success("Invoice added successfully");
         } else {
+          console.error(result.error);
           toast.error("Failed to add invoice");
         }
       }

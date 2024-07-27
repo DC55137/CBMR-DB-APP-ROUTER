@@ -48,15 +48,6 @@ export async function addInvoice(
   } = validatedFields.data;
 
   try {
-    // Check if the invoice number already exists
-    const existingInvoice = await prisma.invoice.findUnique({
-      where: { invoiceNumber },
-    });
-
-    if (existingInvoice) {
-      return { success: false, error: "Invoice number already exists" };
-    }
-
     // Create the new invoice
     const newInvoice = await prisma.invoice.create({
       data: {

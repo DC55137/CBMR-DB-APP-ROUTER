@@ -56,7 +56,7 @@ model Invoice {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
   jobId          String        @db.ObjectId
   job            Job           @relation(fields: [jobId], references: [id])
-  invoiceNumber  String        @unique
+  invoiceNumber  String        
   company       String
   amount         Float
   description    String?

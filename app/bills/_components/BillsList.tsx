@@ -36,23 +36,30 @@ export default function BillsList({ initialInvoices }: BillsListProps) {
   }, [invoices]);
 
   const handleMarkAsPaid = async (invoice: InvoiceWithJob) => {
-    try {
-      const result = await updateInvoice({
-        id: invoice.id,
-        status: InvoiceStatus.PAID,
-      });
-      if (result.success) {
-        toast.success("Invoice marked as paid");
-        setInvoices((prevInvoices) =>
-          prevInvoices.filter((inv) => inv.id !== invoice.id)
-        );
-        router.refresh();
-      } else {
-        toast.error(result.error || "Failed to update invoice");
+    const confirmMarkAsPaid = window.confirm(
+      "Are you sure you want to mark this invoice as paid?"
+    );
+    if (confirmMarkAsPaid) {
+      try {
+        const result = await updateInvoice({
+          id: invoice.id,
+          status: InvoiceStatus.PAID,
+        });
+        if (result.success) {
+          toast.success("Invoice marked as paid");
+          setInvoices((prevInvoices) =>
+            prevInvoices.filter((inv) => inv.id !== invoice.id)
+          );
+          router.refresh();
+        } else {
+          toast.error(result.error || "Failed to update invoice");
+        }
+      } catch (error) {
+        console.error("Error updating invoice:", error);
+        toast.error("An error occurred while updating the invoice");
       }
-    } catch (error) {
-      console.error("Error updating invoice:", error);
-      toast.error("An error occurred while updating the invoice");
+    } else {
+      toast.info("Invoice not marked as paid");
     }
   };
 

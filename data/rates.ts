@@ -15,6 +15,7 @@ export const rates: Rate[] = [
   { service: "Asbestos removal", price: 0.0 },
   { service: "Increased Pitch 25 deg", price: 0.0 },
   { service: "Increased Pitch 30 deg", price: 0.0 },
+  { service: "0.48 bmt increase", price: 0.0 },
   { service: "Gutter replacement", price: 0.0 },
   { service: "Fascia and gutter", price: 0.0 },
   { service: "Safety Rail", price: 0.0 },
