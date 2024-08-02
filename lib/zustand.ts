@@ -1,11 +1,14 @@
 import { create } from "zustand";
-import { Job, JobStage } from "@prisma/client";
+import { Job, Invoice } from "@prisma/client";
 import getJobs from "@/actions/getJobs";
-import { getJob } from "@/actions/getJob";
+import { getJob as getJobAction } from "@/actions/getJob";
+
+// Update the Job type to include invoices
+type JobWithInvoices = Job & { invoices: Invoice[] };
 
 interface JobState {
   jobs: Job[];
-  job: Job | null;
+  job: JobWithInvoices | null;
   isLoading: boolean;
   error: string | null;
   selectedJob: Job | null;
@@ -40,9 +43,9 @@ export const useJobStore = create<JobState>((set) => ({
     }
   },
   getJob: async (id: string) => {
-    set({ isLoading: true, error: null }); // Reset error state
+    set({ isLoading: true, error: null });
     try {
-      const job = await getJob(id);
+      const job = await getJobAction(id);
       if (job) {
         set({ job, isLoading: false });
       } else {
@@ -52,6 +55,7 @@ export const useJobStore = create<JobState>((set) => ({
       set({ job: null, error: "Failed to fetch job", isLoading: false });
     }
   },
+
   updateJobs: (jobs) => set({ jobs }),
   updateJob: (updatedJob) =>
     set((state) => {

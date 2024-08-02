@@ -21,6 +21,7 @@ export const PATH_PAGE = {
   calendar: "/calendar",
   todo: "/todo",
   rates: "/rates",
+  RoofCalculator: "/roof-calculator",
 };
 
 export const PATH_JOB = {

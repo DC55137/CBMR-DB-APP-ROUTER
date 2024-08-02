@@ -2,12 +2,15 @@ import { Job } from "@prisma/client";
 
 function leadMessage(job: Job) {
   return `Hey ${job.name},
-  This is Daniel from CBMR (Chris Board Metal Roofing). 
-  Just looking to follow up on the lead we've just recently accepted on 
-  hipages. Could you please send through the address for the job and we 
-  will work to get you a quote back as soon as possible.
-  Regards, Daniel
-  CBMR`;
+
+This is CBMR (Chris Board Metal Roofing). Just following up on the lead we recently accepted on hipages. Could you please send us the address for the job? We'll work on getting you a quote as soon as possible.
+
+Once we have the address, we can usually provide a quote online, or at least give you an estimate. If you're happy with the quote, someone from CBMR will come out to do an inspection.
+
+Looking forward to your response!
+
+Regards,
+CBMR`;
 }
 
 function cancelJob(job: { name: string; address: string }) {
@@ -27,20 +30,27 @@ function onlineMeasureUpQuote(job: {
   address: string;
   email: string;
 }) {
-  return `Hey ${job.name},
-  This is Daniel from CBMR (Chris Board Metal Roofing). 
-  Thank you for the opportunity to quote the job at: 
+  return `Dear ${job.name},
+
+  Thank you for considering Chris Board Metal Roofing (CBMR) for your roofing needs. We're pleased to inform you that we've completed your quote for the property at:
+  
   ${job.address}
-  The satellite imagery accessed through Queensland Globe, provided CBMR with all the necessary measurement to create the quote.
-  We have finalised the quote and sent it to: 
+  
+  Using advanced satellite imagery from Queensland Globe, we've accurately measured your roof to ensure a precise and competitive quote. We've sent the detailed quote to:
+  
   ${job.email}
-  If you are happy with this price, we will be happy to organise a site meeting between yourself and Chris to clarify any concerns.  
-  Feel free to check out our website for more information about our company. 
-  www.cbroofing.com.au 
-  If you have any questions, please don't hesitate to ask. We look forward to hearing from you 
-  shortly  
-  Regards, Daniel
-  CBMR`;
+  
+  If the quote meets your expectations, we'd be happy to schedule a site visit with Chris to discuss any specifics and address any questions you may have.
+  
+  For more information about our services, quality materials, and past projects, please visit our website:
+  www.cbroofing.com.au
+  
+  Should you have any questions or require further clarification, please don't hesitate to reach out. We're here to ensure your roofing project is a success.
+  
+  We look forward to the possibility of working with you and providing you with a top-quality metal roof.
+  
+  Best regards,
+  The CBMR Team`;
 }
 
 function drawingMeasureUpQuote(job: {

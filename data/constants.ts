@@ -7,6 +7,11 @@ const navigation = [
   { name: "Calendar", href: `${PATH_PAGE.calendar}`, current: false },
   { name: "Todo", href: `${PATH_PAGE.todo}`, current: false },
   { name: "Rates", href: `${PATH_PAGE.rates}`, current: false },
+  {
+    name: "Roof Calculator",
+    href: `${PATH_PAGE.RoofCalculator}`,
+    current: false,
+  },
 ];
 
 const headLabel = [

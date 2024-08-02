@@ -53,7 +53,7 @@ export default function TableRow({
     number: number;
     name: string;
   }) {
-    name = name.replace(/\s/g, "");
+    name = name.replace(/[^a-zA-Z0-9]/g, "");
     return `${number}-${name}`;
   }
 

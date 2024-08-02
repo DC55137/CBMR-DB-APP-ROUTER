@@ -1,26 +1,30 @@
 // app/jobs/[id]/page.tsx
-import { notFound } from "next/navigation";
-import { getJob } from "@/actions/getJob";
+"use client";
+
+import { useEffect } from "react";
+import { notFound, useParams } from "next/navigation";
+import { useJobStore } from "@/lib/zustand";
 import JobGeneral from "./_components/JobGeneral";
 import JobQuote from "./_components/JobQuote";
 import JobImages from "./_components/JobImages";
 import Tabs from "./_components/Tabs";
 import JobInvoice from "./_components/JobInvoice";
-import prisma from "@/lib/prisma";
 
-interface ViewJobProps {
-  params: { id: string };
-}
+export default function ViewJob() {
+  const { id } = useParams();
+  const { job, getJob, isLoading, error } = useJobStore();
 
-export default async function ViewJob({ params }: ViewJobProps) {
-  const job = await prisma.job.findUnique({
-    where: { id: params.id },
-    include: {
-      invoices: true,
-    },
-  });
+  useEffect(() => {
+    if (typeof id === "string" && (!job || job.id !== id)) {
+      getJob(id);
+    }
+  }, [id, job, getJob]);
 
-  if (!job) {
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error || !job) {
     notFound();
   }
 
