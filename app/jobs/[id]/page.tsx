@@ -13,10 +13,15 @@ import JobInvoice from "./_components/JobInvoice";
 export default function ViewJob() {
   const { id } = useParams();
   const { job, getJob, isLoading, error } = useJobStore();
+  console.log("ViewJob", job);
 
   useEffect(() => {
-    if (typeof id === "string" && (!job || job.id !== id)) {
-      getJob(id);
+    if (typeof id === "string") {
+      if (!job || job.id !== id) {
+        // Only fetch if there's no job or the job id doesn't match
+        console.log("Fetching job with id:", id);
+        getJob(id);
+      }
     }
   }, [id, job, getJob]);
 
@@ -24,8 +29,12 @@ export default function ViewJob() {
     return <div>Loading...</div>;
   }
 
-  if (error || !job) {
-    notFound();
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!job) {
+    return <div>job not found</div>;
   }
 
   const TABS = [
@@ -56,7 +65,7 @@ export default function ViewJob() {
   ];
 
   return (
-    <div className="bg-main-1">
+    <div className="bg-main-1 mt-10">
       <main className="container mx-auto pb-10">
         <Tabs tabs={TABS} />
       </main>

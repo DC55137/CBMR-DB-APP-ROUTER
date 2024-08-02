@@ -44,14 +44,17 @@ export const useJobStore = create<JobState>((set) => ({
   },
   getJob: async (id: string) => {
     set({ isLoading: true, error: null });
+    console.log("getJob called with id:", id);
     try {
       const job = await getJobAction(id);
+      console.log("Job fetched:", job);
       if (job) {
         set({ job, isLoading: false });
       } else {
         set({ job: null, error: "Job not found", isLoading: false });
       }
     } catch (error) {
+      console.error("Error fetching job:", error);
       set({ job: null, error: "Failed to fetch job", isLoading: false });
     }
   },

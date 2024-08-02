@@ -6,7 +6,11 @@ import { Job } from "@prisma/client";
 
 export default async function getJobs(): Promise<Job[]> {
   try {
-    const jobs = await prisma.job.findMany({});
+    const jobs = await prisma.job.findMany({
+      include: {
+        invoices: true,
+      },
+    });
     return jobs;
   } catch (error) {
     console.error("Failed to fetch job:", error);
