@@ -1,8 +1,10 @@
 // app/jobs/page.tsx
+import { unstable_noStore as noStore } from "next/cache";
 import getJobs from "@/actions/getJobs";
 import Table from "./_components/Table";
 
 export default async function JobPage() {
+  noStore();
   const jobs = await getJobs();
 
   if (!jobs) {
