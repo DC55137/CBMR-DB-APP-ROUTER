@@ -59,7 +59,7 @@ export default function BillsList({ initialInvoices }: BillsListProps) {
         toast.error("An error occurred while updating the invoice");
       }
     } else {
-      toast.info("Invoice not marked as paid");
+      toast.info("Invoice not marked as paid ");
     }
   };
 
